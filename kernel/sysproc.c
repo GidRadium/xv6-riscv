@@ -114,42 +114,30 @@ sys_uptime(void)
 uint64
 sys_ps_listinfo(void)
 {
-  // адресс пользовательского буфера
   uint64 uaddr;
-  // максимальное количество структур procinfo, которое пользователь разрешает записать в свой буфер
   int lim;
 
   argaddr(0, &uaddr);
   argint(1, &lim);
 
-  // условие
   if (uaddr == 0 || lim < 0) {
     return -1;
   }
 
-  // текущий исполняемый процесс
   struct proc *curproc = myproc();
 
-  // количество всех процессов
   int count = 0;
-  // количество записанных процессов
   int written = 0;
 
-  // таблица процессов
   extern struct proc proc[NPROC];
-  //???????
   extern struct spinlock wait_lock;
 
-  // цикл прохождения по всем процессам
   for (int i = 0; i < NPROC; i++) {
     struct proc *p = &proc[i];
 
-    // wait_lock должен быть взят раньше любого proc->lock
     acquire(&wait_lock);
-    // блокируем текущий процесс
     acquire(&p->lock);
 
-    // условие
     if (p->state == UNUSED || p->state == USED) {
       release(&p->lock);
       release(&wait_lock);
@@ -158,21 +146,17 @@ sys_ps_listinfo(void)
 
     ++count;
 
-    // если все еще помещается в буффер
     if (written < lim) {
       struct procinfo info;
 
       info.pid = p->pid;
       info.state = p->state;
 
-      // копируем массив с названием процесса
       safestrcpy(info.name, p->name, sizeof(info.name));
 
-      // если есть родитель
       if (p->parent != 0) {
         struct proc *parent = p->parent;
 
-        // передаем id родителя
         acquire(&parent->lock);
         info.ppid = parent->pid;
         release(&parent->lock);
@@ -180,15 +164,11 @@ sys_ps_listinfo(void)
         info.ppid = 0;
       }
 
-      /*
-       * Копируем одну структуру непосредственно
-       * в пользовательский буфер.
-       */
       if (copyout(curproc->pagetable,
-                  curproc->sz,
-                  uaddr + written * sizeof(struct procinfo),
-                  (char *)&info,
-                  sizeof(struct procinfo)) < 0) {
+				  curproc->sz,
+          uaddr + written * sizeof(struct procinfo),
+          (char *)&info,
+          sizeof(struct procinfo)) < 0) {
         release(&p->lock);
         release(&wait_lock);
         return -1;
@@ -201,11 +181,9 @@ sys_ps_listinfo(void)
     release(&wait_lock);
   }
 
-  // если процессов больше, чем выделено пользовательским пространством, то вернуть количество всех  этих поцессов
   if (count > lim) {
     return count;
   }
 
-  // возвращаем количество записанных процессов
   return written;
 }
