@@ -41,7 +41,7 @@ main(int argc, char *argv[])
                 exit(1);
             }
         }
-  
+
         if (readBytes < 0) {
             perror("read");
             if (close(pipefd[0]) != 0) {
@@ -71,11 +71,28 @@ main(int argc, char *argv[])
 
     for (int i = 1; i < argc; ++i) {
         int len = strlen(argv[i]);
-        if (write(pipefd[1], argv[i], len) != len ||
-            write(pipefd[1], "\n", 1) != 1) {
+        int offset = 0;
+
+        while (len > 0) {
+            int writed = write(pipefd[1], argv[i] + offset, len);
+            if (writed < 0) {
+                perror("write");
+                if (close(pipefd[1]) != 0) {
+                    perror("close");
+                }
+                if (wait(0) < 0) {
+                    perror("wait");
+                }
+                exit(1);
+            }
+            len -= writed;
+            offset += writed;
+        }
+
+        if (write(pipefd[1], "\n", 1) != 1) {
             perror("write");
             if (close(pipefd[1]) != 0) {
-                perror("close");  
+                perror("close");
             }
             if (wait(0) < 0) {
                 perror("wait");
@@ -99,4 +116,3 @@ main(int argc, char *argv[])
 
     exit(0);
 }
-
