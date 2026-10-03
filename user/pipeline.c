@@ -61,14 +61,14 @@ main(int argc, char *argv[])
         int len = strlen(argv[i]);
         if (write(pipefd[1], argv[i], len) != len ||
             write(pipefd[1], "\n", 1) != 1) {
-                printf("write failed\n");
-                if (close(pipefd[1]) != 0) {
-                    printf("pipe write close failed\n");
-                }
-                if (wait(0) < 0) {
-                    printf("wait failed\n");
-                }
-                exit(1);
+            printf("write failed\n");
+            if (close(pipefd[1]) != 0) {
+                printf("pipe write close failed\n");
+            }
+            if (wait(0) < 0) {
+                printf("wait failed\n");
+            }
+            exit(1);
         }
     }
 
