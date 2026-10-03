@@ -110,3 +110,80 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_ps_listinfo(void)
+{
+  uint64 uaddr;
+  int lim;
+
+  argaddr(0, &uaddr);
+  argint(1, &lim);
+
+  if (uaddr == 0 || lim < 0) {
+    return -1;
+  }
+
+  struct proc *curproc = myproc();
+
+  int count = 0;
+  int written = 0;
+
+  extern struct proc proc[NPROC];
+  extern struct spinlock wait_lock;
+
+  for (int i = 0; i < NPROC; i++) {
+    struct proc *p = &proc[i];
+
+    acquire(&wait_lock);
+    acquire(&p->lock);
+
+    if (p->state == UNUSED || p->state == USED) {
+      release(&p->lock);
+      release(&wait_lock);
+      continue;
+    }
+
+    ++count;
+
+    if (written < lim) {
+      struct procinfo info;
+
+      info.pid = p->pid;
+      info.state = p->state;
+
+      safestrcpy(info.name, p->name, sizeof(info.name));
+
+      if (p->parent != 0) {
+        struct proc *parent = p->parent;
+
+        acquire(&parent->lock);
+        info.ppid = parent->pid;
+        release(&parent->lock);
+      } else {
+        info.ppid = 0;
+      }
+
+      if (copyout(curproc->pagetable,
+				  curproc->sz,
+          uaddr + written * sizeof(struct procinfo),
+          (char *)&info,
+          sizeof(struct procinfo)) < 0) {
+        release(&p->lock);
+        release(&wait_lock);
+        return -1;
+      }
+
+      ++written;
+    }
+
+    release(&p->lock);
+    release(&wait_lock);
+  }
+
+  if (count > lim) {
+    return count;
+  }
+
+  return written;
+}
