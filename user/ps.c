@@ -21,7 +21,7 @@ state_name(int state)
 int
 main(void)
 {
-  int bufsize = 2; // сколько хотим
+  int bufsize = 2;
   struct procinfo *buf;
 
   while (1) {
@@ -35,6 +35,7 @@ main(void)
 
     if (numProc < 0) {
       fprintf(2, "ps: ps_listinfo failed\n");
+      free(buf);
       exit(1);
     }
 
