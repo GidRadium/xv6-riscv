@@ -1,9 +1,11 @@
 #include "types.h"
 #include "riscv.h"
+#include "param.h"
 #include "defs.h"
 #include "spinlock.h"
 #include "proc.h"
 #include "sleeplock.h"
+#include "fs.h"
 #include "file.h"
 
 struct file *
