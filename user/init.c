@@ -9,6 +9,18 @@
 #include "user/user.h"
 #include "kernel/fcntl.h"
 
+void
+mkd(char *name, int major, int minor) 
+{
+  int fd = open(name, O_RDONLY);
+  if (fd < 0) {
+    mknod (name, major, minor);
+  }
+  else {
+    close(fd);
+  }
+}
+
 char *argv[] = {"sh", 0};
 
 int
@@ -22,6 +34,11 @@ main(void)
   }
   dup(0); // stdout
   dup(0); // stderr
+
+  mkd("null", PSEUDO, PSEUDO_NULL);
+  mkd("zero", PSEUDO, PSEUDO_ZERO);
+  mkd("nullstat", PSEUDO, PSEUDO_NULLSTAT);
+  mkd("rtc", RTCDEV, 0);
 
   for (;;) {
     printf("init: starting sh\n");

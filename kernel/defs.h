@@ -22,6 +22,7 @@ void            bunpin(struct buf*);
 void            consoleinit(void);
 void            consoleintr(int);
 void            consputc(int);
+void            pseudoinit(void);
 
 // exec.c
 int             kexec(char*, char**);
@@ -181,6 +182,10 @@ void            plic_complete(int);
 void            virtio_disk_init(void);
 void            virtio_disk_rw(struct buf *, int);
 void            virtio_disk_intr(void);
+
+// mutex.c
+int             mutexalloc(struct file **);
+void            mutexclose(struct sleeplock *);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))
