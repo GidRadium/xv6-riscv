@@ -14,7 +14,7 @@ mkd(char *name, int major, int minor)
 {
   int fd = open(name, O_RDONLY);
   if (fd < 0) {
-    mkhod (name, major, minor);
+    mknod (name, major, minor);
   }
   else {
     close(fd);
@@ -36,7 +36,7 @@ main(void)
   dup(0); // stderr
 
   mkd("null", PSEUDO, PSEUDO_NULL);
-  mkd("sero", PSEUDO, PSEUDO_ZERO);
+  mkd("zero", PSEUDO, PSEUDO_ZERO);
   mkd("nullstat", PSEUDO, PSEUDO_NULLSTAT);
   mkd("rtc", RTCDEV, 0);
 
