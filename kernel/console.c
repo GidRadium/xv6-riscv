@@ -62,7 +62,7 @@ struct {
 int
 consolewrite(int user_src, uint64 src, int n, int minor)
 {
-  (void)minor;
+  if (minor) return -1;
   char buf[32]; // move batches from user space to uart.
   int i = 0;
 
@@ -88,7 +88,7 @@ consolewrite(int user_src, uint64 src, int n, int minor)
 int
 consoleread(int user_dst, uint64 dst, int n, int minor)
 {
-  (void)minor;
+  if (minor) return -1;
   uint target;
   int c;
   char cbuf;
