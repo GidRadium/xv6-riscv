@@ -10,7 +10,7 @@
 #include "kernel/fcntl.h"
 
 void
-mkdev(char *name, int major, int minor) 
+mkd(char *name, int major, int minor) 
 {
   int fd = open(name, O_RDONLY);
   if (fd < 0) {
@@ -35,10 +35,10 @@ main(void)
   dup(0); // stdout
   dup(0); // stderr
 
-  mkdev("null", PSEUDO, PSEUDO_NULL);
-  mkdev("sero", PSEUDO, PSEUDO_ZERO);
-  mkdev("nullstat", PSEUDO, PSEUDO_NULLSTAT);
-  mkdev("rtc", RTCDEV, 0);
+  mkd("null", PSEUDO, PSEUDO_NULL);
+  mkd("sero", PSEUDO, PSEUDO_ZERO);
+  mkd("nullstat", PSEUDO, PSEUDO_NULLSTAT);
+  mkd("rtc", RTCDEV, 0);
 
   for (;;) {
     printf("init: starting sh\n");
