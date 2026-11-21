@@ -12,7 +12,7 @@ static struct spinlock countlock;
 static uint64 bytes_written;
 
 static int
-pseudoread(int user_dst, uint64 dst, int n, short minor) // dst - адрес начала буфера
+pseudoread(int user_dst, uint64 dst, int n, int minor) // dst - адрес начала буфера
 {
     static char zeroes[128];
     uint64 count;
@@ -52,7 +52,7 @@ pseudoread(int user_dst, uint64 dst, int n, short minor) // dst - адрес н�
 }
 
 static int
-pseudowrite(int user_src, uint64 src, int n, short minor)
+pseudowrite(int user_src, uint64 src, int n, int minor)
 {
   if (n < 0)
     return -1;
